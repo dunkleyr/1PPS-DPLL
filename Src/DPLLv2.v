@@ -297,8 +297,8 @@ begin
     if(Rst_Err)
         Err <= #1 0;
     else if(CE_Err)
-        Err <= #1 Err + ((xPPS | Up) ? pPosFreqPhiBase
-                                     : (iPPS | Dn) ? pNegFreqPhiBase : 0);
+        Err <= #1 Err + (((xPPS | Up) & ~(iPPS | Dn)) ? pPosFreqPhiBase :
+						((iPPS | Dn) & ~(xPPS | Up)) ? pNegFreqPhiBase : 0);
 end
 
 ////////////////////////////////////////////////////////////////////////////////
