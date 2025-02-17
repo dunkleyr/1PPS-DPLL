@@ -129,7 +129,7 @@ module DPLLv2 #(
     output  reg ErrLim,         // Allowable Phase Error Limit FF
     output  reg [3:0] LockCntr, // DPLL Lock Delay Cntr
     
-    output  [31:0] Kphi,        // NCO Frequency Control Word (FCW)
+    output  reg [31:0] Kphi,    // NCO Frequency Control Word (FCW)
     output  [31:0] NCODrv,      // NCO Loop Filter Output
     output  reg [31:0] NCO      // NCO Phase Register
 );
@@ -319,7 +319,16 @@ end
 
 //  Offset nominal NCO FCW by the accumulated/integrated Phase Error
 
-assign Kphi = pBasePhaseIncrement + PhiErr;
+//assign Kphi = pBasePhaseIncrement + PhiErr;
+
+// Registered Kphi, to help meet timing with high fanout in VCODriveFilter.
+always @(posedge Clk)
+begin
+	if(Rst)
+		Kphi <= #1 pBasePhaseIncrement;
+	else
+		Kphi <= #1 pBasePhaseIncrement + PhiErr;
+end
 
 //  Filter NCO FCW before applying to NCO (DDS)
 
